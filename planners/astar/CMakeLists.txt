@@ -10,8 +10,24 @@ file(GLOB SOURCE_FILES
 list(FILTER SOURCE_FILES EXCLUDE REGEX ".*_test\\.cc$")
 list(FILTER SOURCE_FILES EXCLUDE REGEX ".*_test\\.cpp$")
 
-add_library(${TargetName} SHARED
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../bin)
+# set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../lib)
+# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../lib)
+
+add_executable(${TargetName}
   ${SOURCE_FILES}
+)
+
+add_library(l${TargetName} SHARED
+  ${SOURCE_FILES}
+)
+
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../common
+)
+
+target_link_libraries(${TargetName} PRIVATE
+  common
 )
 
 file(GLOB HEADER_FILES 
@@ -26,6 +42,6 @@ foreach(v ${HEADER_FILES})
     install(FILES ${v} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../../include/${path})
 endforeach()
 
-install(TARGETS ${TargetName}
+install(TARGETS l${TargetName}
   DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../../lib
 )

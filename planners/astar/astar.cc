@@ -31,12 +31,12 @@
 #include <queue>
 #include <vector>
 
-#include "common/vec2d.h"
+#include "vec2d.h"
 
 namespace pathplan {
 namespace planner {
 
-using namespace ::common::Vec2d;
+using ::pathplan::common::Vec2d;
 using namespace std;
 struct Node {
   Vec2d point;
@@ -65,7 +65,7 @@ bool isValid(int x, int y, int rows, int cols,
 
 // 计算启发式函数h值（曼哈顿距离）
 int calculateHeuristic(Vec2d p1, Vec2d p2) {
-  return abs(p1.x - p2.x) + abs(p1.y - p2.y);
+  return abs(p1.x() - p2.x()) + abs(p1.y() - p2.y());
 }
 
 // A*路径规划算法
@@ -79,7 +79,7 @@ vector<Vec2d> aStarPathPlanning(const vector<vector<int>> &grid, Vec2d start,
   vector<vector<Vec2d>> parent(rows, vector<Vec2d>(cols, Vec2d(-1, -1)));
   priority_queue<Node> pq;
 
-  g_cost[start.x][start.y] = 0;
+  g_cost[start.x()][start.y()] = 0;
   int h_cost = calculateHeuristic(start, goal);
   pq.push(Node(start, 0, h_cost));
 
@@ -90,9 +90,10 @@ vector<Vec2d> aStarPathPlanning(const vector<vector<int>> &grid, Vec2d start,
     Vec2d p = current.point;
 
     // 如果当前点是目标点，构造路径并返回
-    if (p == goal) {
+    if (p.x() == goal.x() && p.y() == goal.y()) {
       vector<Vec2d> path;
-      for (Vec2d at = goal; at.x != -1 && at.y != -1; at = parent[at.x][at.y]) {
+      for (Vec2d at = goal; at.x() != -1 && at.y() != -1;
+           at = parent[at.x()][at.y()]) {
         path.push_back(at);
       }
       reverse(path.begin(), path.end());
@@ -101,11 +102,11 @@ vector<Vec2d> aStarPathPlanning(const vector<vector<int>> &grid, Vec2d start,
 
     // 扩展当前节点的四个邻居节点
     for (int i = 0; i < 4; i++) {
-      int newX = p.x + dx[i];
-      int newY = p.y + dy[i];
+      int newX = p.x() + dx[i];
+      int newY = p.y() + dy[i];
 
       if (isValid(newX, newY, rows, cols, grid)) {
-        int new_g_cost = g_cost[p.x][p.y] + 1;  // 假设每个格子的移动代价为1
+        int new_g_cost = g_cost[p.x()][p.y()] + 1;  // 假设每个格子的移动代价为1
         int new_h_cost = calculateHeuristic(Vec2d(newX, newY), goal);
         int new_f_cost = new_g_cost + new_h_cost;
 
@@ -138,7 +139,7 @@ int main() {
   if (!path.empty()) {
     cout << "Path found:" << endl;
     for (const auto &p : path) {
-      cout << "(" << p.x << ", " << p.y << ") ";
+      cout << "(" << p.x() << ", " << p.y() << ") ";
     }
     cout << endl;
   } else {
